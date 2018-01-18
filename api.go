@@ -2,12 +2,23 @@ package api
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 )
+
+var config *Config
+
+// Config API responser settings
+type Config struct {
+	AllowedContentType string
+}
+
+// Setup API general settings
+func Setup(c *Config) {
+	config = c
+}
 
 // Response structure
 type Response struct {
@@ -71,16 +82,16 @@ func (e *Error) Error() string {
 	return e.Title
 }
 
-// Response function builds API response
-func Response(c *gin.Context, r *Response) {
+// Resp function builds API response
+func Resp(c *gin.Context, r *Response) {
 	if r.HTTPStatus == 0 {
 		r.HTTPStatus = http.StatusOK
 	}
 	c.JSON(r.HTTPStatus, r)
 }
 
-// Error sends error response
-func Error(c *gin.Context, code int, msg interface{}) {
+// Err sends error response
+func Err(c *gin.Context, code int, msg interface{}) {
 	r := Response{}
 	if code != 0 {
 		r.HTTPStatus = code
@@ -96,20 +107,21 @@ func Error(c *gin.Context, code int, msg interface{}) {
 	c.AbortWithStatusJSON(code, r)
 }
 
+// CheckContentType middleware
 func CheckContentType(c *gin.Context) {
-	act := strings.ToLower(os.Getenv(allowedContentType))
+	act := strings.ToLower(config.AllowedContentType)
 	if strings.ToLower(c.Request.Method) == "get" {
 		if c.GetHeader("Accept") != "*/*" && strings.ToLower(c.GetHeader("Accept")) != act {
-			apiError(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
+			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
 			return
 		}
 	} else {
 		if strings.ToLower(c.ContentType()) != act {
-			apiError(c, http.StatusUnsupportedMediaType, http.StatusText(http.StatusUnsupportedMediaType))
+			Err(c, http.StatusUnsupportedMediaType, http.StatusText(http.StatusUnsupportedMediaType))
 			return
 		}
 		if c.GetHeader("Accept") != "*/*" && strings.ToLower(c.GetHeader("Accept")) != act {
-			apiError(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
+			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
 			return
 		}
 	}
