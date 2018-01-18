@@ -12,7 +12,14 @@ var config *Config
 
 // Config API responser settings
 type Config struct {
-	AllowedContentType string
+	ContentType string
+}
+
+func (c *Config) getContentType() string {
+	if c.ContentType == "" {
+		c.ContentType = "application/json"
+	}
+	return c.ContentType
 }
 
 // Setup API general settings
@@ -109,7 +116,7 @@ func Err(c *gin.Context, code int, msg interface{}) {
 
 // CheckContentType middleware
 func CheckContentType(c *gin.Context) {
-	act := strings.ToLower(config.AllowedContentType)
+	act := strings.ToLower(config.getContentType())
 	if strings.ToLower(c.Request.Method) == "get" {
 		if c.GetHeader("Accept") != "*/*" && strings.ToLower(c.GetHeader("Accept")) != act {
 			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
