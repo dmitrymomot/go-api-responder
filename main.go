@@ -105,12 +105,14 @@ func Err(c *gin.Context, code int, msg interface{}) {
 	} else {
 		r.HTTPStatus = http.StatusInternalServerError
 	}
-	r.AddError(Error{
+	err := Error{
 		ID:     uuid.Must(uuid.NewV1()).String(),
 		Code:   code,
 		Title:  http.StatusText(code),
 		Detail: msg,
-	})
+	}
+	r.AddError(err)
+	log.Println(err)
 	c.AbortWithStatusJSON(code, r)
 }
 
