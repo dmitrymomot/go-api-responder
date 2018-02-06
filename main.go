@@ -77,12 +77,13 @@ type Meta map[string]interface{}
 
 // Error structure
 type Error struct {
-	ID     string      `json:"id,omitempty"`
-	Status int         `json:"-"`
-	Code   int         `json:"code,omitempty"`
-	Title  string      `json:"title,omitempty"`
-	Detail interface{} `json:"detail,omitempty"`
-	Links  Links       `json:"links,omitempty"`
+	ID        string      `json:"id,omitempty"`
+	Status    int         `json:"-"`
+	Code      int         `json:"code,omitempty"`
+	Title     string      `json:"title,omitempty"`
+	Detail    interface{} `json:"detail,omitempty"`
+	Links     Links       `json:"links,omitempty"`
+	PrevError error       `json:"-"`
 }
 
 // Error text
@@ -99,7 +100,7 @@ func Resp(c *gin.Context, r *Response) {
 }
 
 // Err sends error response
-func Err(c *gin.Context, code int, msg interface{}) {
+func Err(c *gin.Context, code int, msg interface{}, prevErr error) {
 	r := Response{}
 	if code != 0 {
 		r.HTTPStatus = code
@@ -107,10 +108,11 @@ func Err(c *gin.Context, code int, msg interface{}) {
 		r.HTTPStatus = http.StatusInternalServerError
 	}
 	err := Error{
-		ID:     uuid.Must(uuid.NewV1()).String(),
-		Code:   code,
-		Title:  http.StatusText(code),
-		Detail: msg,
+		ID:        uuid.Must(uuid.NewV1()).String(),
+		Code:      code,
+		Title:     http.StatusText(code),
+		Detail:    msg,
+		PrevError: prevErr,
 	}
 	r.AddError(err)
 	log.Println(err)
