@@ -124,16 +124,16 @@ func CheckContentType(c *gin.Context) {
 	act := strings.ToLower(config.getContentType())
 	if strings.ToLower(c.Request.Method) == "get" {
 		if c.GetHeader("Accept") != "*/*" && strings.ToLower(c.GetHeader("Accept")) != act {
-			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
+			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable), nil)
 			return
 		}
 	} else {
 		if strings.ToLower(c.ContentType()) != act {
-			Err(c, http.StatusUnsupportedMediaType, http.StatusText(http.StatusUnsupportedMediaType))
+			Err(c, http.StatusUnsupportedMediaType, http.StatusText(http.StatusUnsupportedMediaType), nil)
 			return
 		}
 		if c.GetHeader("Accept") != "*/*" && strings.ToLower(c.GetHeader("Accept")) != act {
-			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable))
+			Err(c, http.StatusNotAcceptable, http.StatusText(http.StatusNotAcceptable), nil)
 			return
 		}
 	}
