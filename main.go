@@ -115,7 +115,9 @@ func Err(c *gin.Context, code int, msg interface{}, prevErr error) {
 		PrevError: prevErr,
 	}
 	r.AddError(err)
-	log.Println(err)
+	if prevErr != nil {
+		log.Println(err)
+	}
 	c.AbortWithStatusJSON(code, r)
 }
 
