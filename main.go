@@ -108,7 +108,7 @@ func Err(c *gin.Context, code int, msg interface{}, prevErr error) {
 		r.HTTPStatus = http.StatusInternalServerError
 	}
 	err := Error{
-		ID:        uuid.Must(uuid.NewV1()).String(),
+		ID:        uuid.NewV1().String(),
 		Code:      code,
 		Title:     http.StatusText(code),
 		Detail:    msg,
